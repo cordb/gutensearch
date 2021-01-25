@@ -21,30 +21,38 @@ The below worked for a dedicated server with an Intel Atom 2.40GHz CPU, 16GB RAM
 I've only tested this on a clean install of Ubuntu 20.04.1 LTS.
 
 You'll need the following to get started:
-```sudo apt update
+```
+sudo apt update
 sudo apt install screen
 sudo apt install unzip
 sudo apt install vim # not strictly necessary
-sudo apt install postgresql postgresql-contrib```
+sudo apt install postgresql postgresql-contrib
+```
 
 ### Setting up Postgres
 You can use [this guide](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04). You may want to increase resources as follows:
-```vim /etc/postgresql/12/main/postgresql.conf```
+```
+vim /etc/postgresql/12/main/postgresql.conf
+```
 
 Changing the following (here shown for a server with 16GB RAM):
-```shared_buffers = 8GB # (25% of server RAM)
+```
+shared_buffers = 8GB # (25% of server RAM)
 work_mem = 40MB # (RAM * 0.25 / 100)
 maintenance_work_mem = 800MB # (RAM * 0.05)
-effective_cache_size = 8GB # (RAM * 0.5)```
+effective_cache_size = 8GB # (RAM * 0.5)
+```
 
 ### Setting up Python
 As usual the app relies on an alphabet soup of libraries:
-```sudo apt install software-properties-common
+```
+sudo apt install software-properties-common
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt install python3.8
 sudo apt-get install python3-venv
 sudo apt install python3-pip
-sudo apt install libpq-dev```
+sudo apt install libpq-dev
+```
 
 ### Getting the data
 #### Create project folder
@@ -53,19 +61,23 @@ mkdir gutensearch
 #### Download raw data
 You will want this one in a screen as it might take a while - a few minutes in a decent data centre at 30MB/s, or a night and morning from a home connection.
 
-```screen -S download_data
+```
+screen -S download_data
 wget -c http://static.decontextualize.com/gutenberg-dammit-files-v002.zip
 mv gutenberg-dammit-files-v002.zip gutensearch/gutenberg-dammit-files-v002.zip
 cd gutensearch
 unzip gutenberg-dammit-files-v002.zip -d gutenberg-dammit-files-v002
-exit```
+exit
+```
 
 #### Insert the metadata
 I recommend doing this one by hand line by line, instead of passing the file to psql. Open a screen, then line-by-line `server-process-part1.sql`.
 
-```screen -S process_data
+```
+screen -S process_data
 sudo -u postgres psql # run through server-process-part1.sql
-exit```
+exit
+```
 
 SQL part 1 streams the metadata JSON into a table.
 
@@ -85,7 +97,8 @@ exit
 #### Transform the data
 This part will take the longest as 6GB zipped is expanded into more than 60GB of tables and indices. \timing for each part is included as comments in the code; on the instance mentioned earlier, you're looking at the better part of a day.
 
-```screen -r process_data
+```
+screen -r process_data
 sudo -u postgres psql # now run through server-process-2.sql
 exit
 ```
@@ -94,19 +107,23 @@ exit
 #### Libraries
 You'll need the following:
 
-```pip install --upgrade pip
+```
+pip install --upgrade pip
 python3 -m pip install dash
 python3 -m pip install dash_auth
 python3 -m pip install pandas
 python3 -m pip install sqlalchemy
 python3 -m pip install networkx
-python3 -m pip install gunicorn```
+python3 -m pip install gunicorn
+```
 
 #### Set up HTTPS
 Follow instructions [here](https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx).
 
 Don't forget to backup the certs:
-```scp -r user@host:/etc/letsencrypt /path/to/backup/location```
+```
+scp -r user@host:/etc/letsencrypt /path/to/backup/location
+```
 
 #### Set up firewall and reverse proxy
 Find the relevant instructions for your provider. Mine are [here](https://www.scaleway.com/en/docs/how-to-configure-nginx-reverse-proxy/).
@@ -114,7 +131,8 @@ Find the relevant instructions for your provider. Mine are [here](https://www.sc
 You'll need to set up the firewall, instructions [here](https://linuxize.com/post/how-to-setup-a-firewall-with-ufw-on-ubuntu-18-04/).
 
 Relevant files can be found here:
-```cd /etc/nginx/sites-available
+```
+cd /etc/nginx/sites-available
 sudo vim reverse-proxy.conf # add server_name and change the port
 sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf
 ```

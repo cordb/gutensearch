@@ -56,7 +56,9 @@ sudo apt install libpq-dev
 
 ### Getting the data
 #### Create project folder
+```
 mkdir gutensearch
+```
 
 #### Download raw data
 You will want this one in a screen as it might take a while - a few minutes in a decent data centre at 30MB/s, or a night and morning from a home connection.

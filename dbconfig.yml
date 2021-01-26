@@ -1,0 +1,2 @@
+Postgres:
+  constring: 'postgresql+psycopg2://user:password@host:port/gutensearch'

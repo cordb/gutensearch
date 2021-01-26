@@ -461,7 +461,7 @@ def update_discovery_table(n_clicks, language, search_terms):
             limit 30;
     """
     connection = engine.connect()
-    results = pd.read_sql_query(query, connection, params=[language, search_terms, language, language, search_terms, language, language, search_terms])[["author", "title", "relevant_paragraphs"]]
+    results = pd.read_sql_query(query, connection, params=[language, language, search_terms, language, language, search_terms])[["author", "title", "relevant_paragraphs"]]
     connection.close()
     #turn df back into dictionary 
     dict_results= results.to_dict('records')

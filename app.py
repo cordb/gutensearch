@@ -446,7 +446,6 @@ def update_discovery_table(n_clicks, language, search_terms):
                 select 
                 num
                 , paragraph
-                , ts_rank_cd(textsearchable_index_col, plainto_tsquery(%s::regconfig, %s), 32) as rank 
                 , ts_headline(%s, paragraph, plainto_tsquery(%s::regconfig, %s), 'MaxFragments=1000, StartSel=**, StopSel=**') as highlighted_result
                 from gutenberg.paragraphs 
                 where language = %s::regconfig and textsearchable_index_col @@ plainto_tsquery(%s::regconfig, %s)

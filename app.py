@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import yaml
 import psycopg2
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from psycopg2 import OperationalError, sql
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
@@ -338,7 +338,7 @@ def render_content(tab):
                 
                 #### GDPR, PDPA etc.
                 
-                I currently track nothing that I know of. I may add a trigger to the database to record the most popular queries so I can take a look at them and improve the search, but it hasn't been done yet and I'll update this section when it happens.
+                I currently track nothing (that I know of) except your input when you press submit, and the timestamp thereof. You can verify this yourself in the repository.
                 
                 #### Licenses
                 
@@ -347,6 +347,10 @@ def render_content(tab):
                 The "Gutenberg Dammit" corpus was based off [Julian Brooke's work](http://www.cs.toronto.edu/~jbrooke/gutentag/) at the University of Toronto, which used the following license:
                 
                 This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit https://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+                
+                #### Repository and contact
+                
+                You can find a version of the code that runs locally [here](https://github.com/cordb/gutensearch). You can get in touch with me at contact@ this domain.
                 
                 #### WIP
                 
@@ -399,8 +403,11 @@ def update_table(n_clicks, language, search_terms, limit, offset):
             order by rank desc
             limit %s offset %s;
     """
+    # Make sure to leave a space after :language or sqlalchemy won't insert the string correctly.
+    insert = text("""insert into gutenberg.query_log (tab, time, language, query, rows_returned_aka_limit, start_row_aka_offset) values ('Search', now(), :language ::regconfig, :query, :rows_returned_aka_limit, :start_row_aka_offset);""")
     connection = engine.connect()
     results = pd.read_sql_query(query, connection, params=[language, search_terms, language, language, search_terms, language, language, search_terms, limit, offset-1])
+    connection.execute(insert, ({"language": language, "query": search_terms, "rows_returned_aka_limit": limit, "start_row_aka_offset": offset}))
     connection.close()
 
     #turn df back into dictionary 
@@ -460,8 +467,11 @@ def update_discovery_table(n_clicks, language, search_terms):
             order by rand desc
             limit 30;
     """
+    # Make sure to leave a space after :language or sqlalchemy won't insert the string correctly.
+    insert = text("""insert into gutenberg.query_log (tab, time, language, query, rows_returned_aka_limit, start_row_aka_offset) values ('Discovery', now(), :language ::regconfig, :query, 30, 0);""")
     connection = engine.connect()
     results = pd.read_sql_query(query, connection, params=[language, language, search_terms, language, language, search_terms])[["author", "title", "relevant_paragraphs"]]
+    connection.execute(insert, ({"language": language, "query": search_terms}))
     connection.close()
     #turn df back into dictionary 
     dict_results= results.to_dict('records')

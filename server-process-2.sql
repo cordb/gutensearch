@@ -130,3 +130,16 @@ order by books_mentioned_in desc;
 
 alter table gutenberg.mentioned_authors add primary key (mentioned_author, mentioned_by);
 -- Time: 2484.102 ms (00:02.484)
+
+-- Table for logging
+create table gutenberg.query_log
+  (tab text
+    , time timestamptz
+    , language regconfig
+    , query text
+    , rows_returned_aka_limit integer
+    , start_row_aka_offset integer);
+create index on gutenberg.query_log (time);    
+create index on gutenberg.query_log (tab);  
+create index on gutenberg.query_log (language);  
+grant insert on table gutenberg.query_log to gutensearch_read_only;

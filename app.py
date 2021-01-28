@@ -163,6 +163,13 @@ def render_content(tab):
                 html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
             ], style={'padding': 20, 'text-align': 'center'}),
             html.Br(),
+            dcc.Markdown('''
+                ###### Notes:
+                - Stopwords ("to", "the", "a", etc.) will be ignored. "to be or not to be" will thus return nothing.
+                - (English only) a common enough query ("once upon a time") may time out due to too many matches. Try adding more words or less common words.
+                
+                '''
+            ),
             html.Div(id='search-terms-active'),
             html.Br(),
             html.Div(

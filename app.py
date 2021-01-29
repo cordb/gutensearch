@@ -137,7 +137,7 @@ def render_content(tab):
                 dcc.Markdown('''
                     **Search terms:**
                     '''),
-                dcc.Input(id='search-terms-input', type='text', value='contiguous impressions'),
+                dcc.Input(id='search-terms-input', type='text', value='bellows to mend'),
                 dcc.Markdown('''
                     **Show this many rows:**
                     '''

@@ -167,6 +167,7 @@ def render_content(tab):
                 ###### Notes:
                 - Stopwords ("to", "the", "a", etc.) will be ignored. "to be or not to be" will thus return nothing.
                 - (English only) a common enough query ("once upon a time") may time out due to too many matches. Try adding more words or less common words.
+                - If you just want to look up an author or a title, head to [Project Gutenberg](https://www.gutenberg.org/ebooks/) or [Google](https://www.google.com/search?q=site%3Agutenberg.org) instead.
                 
                 '''
             ),
